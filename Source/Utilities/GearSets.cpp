@@ -170,128 +170,79 @@ bool GearSets::Item::CanSpecial() const
 
 namespace GearSets
 {
-    namespace
+    bool InContainer(const Containers::Container& C, const GearSets::Item& Item, Containers::Item *Found = nullptr)
     {
-        bool InContainer(const Containers::Container& C, const GearSets::Item& Item, Containers::Item* Found = nullptr)
+        if (!C || C.IsEmpty()) return false;
+
+        std::int32_t FoundIndex = C.GetIndexOf(Item.GetID());
+        if (FoundIndex >= 0)
         {
-            if (!C || C.IsEmpty()) return false;
-
-            std::int32_t FoundIndex = C.GetIndexOf(Item.GetID());
-            if (FoundIndex >= 0)
-            {
-                if (Found) *Found = C.GetItems()[FoundIndex];
-                return true;
-            }
-
-            if (Item.IsChargeable())
-            {
-                for (auto& Charged : Item.GetChargedAliases())
-                {
-                    FoundIndex = C.GetIndexOf(Charged.ID);
-                    if (FoundIndex >= 0)
-                    {
-                        if (Found) *Found = C.GetItems()[FoundIndex];
-                        return true;
-                    }
-                }
-            }
-
-            if (Item.IsDegradable())
-            {
-                for (auto& Degraded : Item.GetDegradedAliases())
-                {
-                    FoundIndex = C.GetIndexOf(Degraded.ID);
-                    if (FoundIndex >= 0)
-                    {
-                        if (Found) *Found = C.GetItems()[FoundIndex];
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            if (Found) *Found = C.GetItems()[FoundIndex];
+            return true;
         }
 
-        bool InContainer_Broken(const Containers::Container& C, const GearSets::Item& Item, Containers::Item* Found = nullptr)
+        if (Item.IsChargeable())
         {
-            if (!C || C.IsEmpty()) return false;
-
-            std::int32_t FoundIndex = 0;
-
-            if (Item.IsChargeable())
+            for (auto& Charged : Item.GetChargedAliases())
             {
-                for (auto& Uncharged : Item.GetUnchargedAliases())
+                FoundIndex = C.GetIndexOf(Charged.ID);
+                if (FoundIndex >= 0)
                 {
-                    FoundIndex = C.GetIndexOf(Uncharged.ID);
-                    if (FoundIndex >= 0)
-                    {
-                        if (Found) *Found = C.GetItems()[FoundIndex];
-                        return true;
-                    }
+                    if (Found) *Found = C.GetItems()[FoundIndex];
+                    return true;
                 }
             }
-
-            if (Item.IsDegradable())
-            {
-                for (auto& Broken : Item.GetBrokenAliases())
-                {
-                    FoundIndex = C.GetIndexOf(Broken.ID);
-                    if (FoundIndex >= 0)
-                    {
-                        if (Found) *Found = C.GetItems()[FoundIndex];
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
-        bool InNameCache(const std::vector<std::string>& NameCache, const GearSets::Item& Item, std::string* Out = nullptr, std::int32_t* IndexOut = nullptr)
+        if (Item.IsDegradable())
         {
-            bool Found = false;
-            for (std::uint32_t I = 0; I < NameCache.size(); I++)
+            for (auto& Degraded : Item.GetDegradedAliases())
             {
-                if (NameCache[I] == Item.GetName())
+                FoundIndex = C.GetIndexOf(Degraded.ID);
+                if (FoundIndex >= 0)
                 {
-                    if (Out) *Out = NameCache[I];
-                    if (IndexOut) *IndexOut = I;
-                    Found = true;
-                    break;
-                }
-
-                if (Item.IsChargeable())
-                {
-                    for (auto& Uncharged : Item.GetUnchargedAliases())
-                    {
-                        if (NameCache[I] == Uncharged.Name)
-                        {
-                            if (Out) *Out = NameCache[I];
-                            if (IndexOut) *IndexOut = I;
-                            Found = true;
-                            break;
-                        }
-                    }
-                    if (Found) break;
-                }
-
-                if (Item.IsDegradable())
-                {
-                    for (auto& Degradable : Item.GetDegradedAliases())
-                    {
-                        if (NameCache[I] == Degradable.Name)
-                        {
-                            if (Out) *Out = NameCache[I];
-                            if (IndexOut) *IndexOut = I;
-                            Found = true;
-                            break;
-                        }
-                    }
-                    if (Found) break;
+                    if (Found) *Found = C.GetItems()[FoundIndex];
+                    return true;
                 }
             }
-            return Found;
         }
+
+        return false;
+    }
+
+    bool InContainer_Broken(const Containers::Container& C, const GearSets::Item& Item, Containers::Item *Found = nullptr)
+    {
+        if (!C || C.IsEmpty()) return false;
+
+        std::int32_t FoundIndex = 0;
+
+        if (Item.IsChargeable())
+        {
+            for (auto& Uncharged : Item.GetUnchargedAliases())
+            {
+                FoundIndex = C.GetIndexOf(Uncharged.ID);
+                if (FoundIndex >= 0)
+                {
+                    if (Found) *Found = C.GetItems()[FoundIndex];
+                    return true;
+                }
+            }
+        }
+
+        if (Item.IsDegradable())
+        {
+            for (auto& Broken : Item.GetBrokenAliases())
+            {
+                FoundIndex = C.GetIndexOf(Broken.ID);
+                if (FoundIndex >= 0)
+                {
+                    if (Found) *Found = C.GetItems()[FoundIndex];
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
 
@@ -313,32 +264,12 @@ bool GearSets::Set::Equip(const std::function<bool()>& StopEarly) const
         }
     }
 
-
-    auto InvNames = Inventory::GetItemNames();
-    auto EquippedNames = Equipment::GetItemNames();
-
-    std::vector<std::string> UneqippedItems;
-
-    for (const auto& [EquipmentSlot, Item] : this->Items)
-    {
-        if (!Item) continue;
-
-        if (!InNameCache(EquippedNames, Item))
-        {
-            std::string Out;
-            if (!InNameCache(InvNames, Item, &Out))
-                continue;
-            UneqippedItems.emplace_back(std::move(Out));
-        }
-    }
-
-    if (UneqippedItems.empty())
-        return true;
+    if (UnequippedItems.empty()) return true;
 
     if (Bank::IsOpen() && !Bank::Close(Profile::RollUseEscHotkey()))
         return false;
 
-    auto InvItems = Inventory::GetItems(UneqippedItems);
+    auto InvItems = Inventory::GetItems(UnequippedItems);
     if (InvItems.empty())
         return false;
 
@@ -376,26 +307,26 @@ bool GearSets::Set::Withdraw() const
     if (!Bank::IsOpen())
         return false;
 
-    auto InvNames = Inventory::GetItemNames();
-    auto EquippedNames = Equipment::GetItemNames();
-    auto BankNames = Bank::GetItemNames();
-    std::vector<std::string> UnequippedItems;
+    auto InventoryContainer = Containers::Container(Containers::INVENTORY);
+    auto EquipmentContainer = Containers::Container(Containers::EQUIPMENT);
+    auto BankContainer = Containers::Container(Containers::BANK);
 
+    std::vector<std::int32_t> UnequippedItems;
     for (const auto& [EquipmentSlot, Item] : this->Items)
     {
         if (!Item) continue;
 
-        if (!InNameCache(EquippedNames, Item) && !InNameCache(InvNames, Item))
+        if (!InContainer(EquipmentContainer, Item) && !InContainer(InventoryContainer, Item))
         {
-            std::string Out;
-            if (!InNameCache(BankNames, Item, &Out))
+            Containers::Item Found;
+            if (InContainer(BankContainer, Item, &Found))
+                UnequippedItems.emplace_back(Found.GetID());
+            else
                 return false;
-            UnequippedItems.emplace_back(std::move(Out));
         }
     }
 
-    if (UnequippedItems.empty())
-        return true;
+    if (UnequippedItems.empty()) return true;
 
     auto BankItems = Bank::GetItems(UnequippedItems);
     if (BankItems.empty())
@@ -486,57 +417,22 @@ bool GearSets::Set::UseSpecial() const
 bool GearSets::Set::Holding() const
 {
     auto InventoryContainer = Containers::Container(Containers::INVENTORY);
-    auto EquipmentContainer = Containers::Container(Containers::INVENTORY);
+    auto EquipmentContainer = Containers::Container(Containers::EQUIPMENT);
 
-    return std::all_of(this->Items.begin(), this->Items.end(), [&](const GearSets::Item& I)
-    {
-
-
-        return InventoryContainer.Contains(I.GetID());
-    }
-    );
-
-
-    auto InvNames = Inventory::GetItemNames();
-    auto EquippedNames = Equipment::GetItemNames();
-    for (const auto& [EquipmentSlot, Item] : this->Items)
-    {
-        if (!Item) continue;
-
-        if (InNameCache(EquippedNames, Item))
-            continue;
-
-        if (InNameCache(InvNames, Item))
-            continue;
-
-        return false;
-    }
-    return true;
+    return std::all_of(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I)
+    { return InContainer(InventoryContainer, I.second) || InContainer(EquipmentContainer, I.second); });
 }
 
 bool GearSets::Set::Equipped() const
 {
-    auto EquippedNames = Equipment::GetItemNames();
-    for (const auto& [EquipmentSlot, Item] : this->Items)
-    {
-        if (!Item) continue;
-
-        if (!InNameCache(EquippedNames, Item))
-            return false;
-    }
-    return true;
+    auto EquipmentContainer = Containers::Container(Containers::EQUIPMENT);
+    return std::all_of(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I) { return InContainer(EquipmentContainer, I.second); });
 }
 
 bool GearSets::Set::InInventory() const
 {
-    auto InvNames = Inventory::GetItemNames();
-    for (const auto& [EquipmentSlot, Item] : this->Items)
-    {
-        if (!Item) continue;
-        if (!InNameCache(InvNames, Item))
-            return false;
-    }
-    return true;
+    auto InventoryContainer = Containers::Container(Containers::INVENTORY);
+    return std::all_of(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I) { return InContainer(InventoryContainer, I.second); });
 }
 
 bool GearSets::Set::InBank() const
@@ -544,54 +440,30 @@ bool GearSets::Set::InBank() const
     if (!Bank::IsOpen())
         return false;
 
-    auto BankAmounts = Bank::GetItemAmounts();
-    auto BankNames = Bank::GetItemNames();
-
-    if (BankAmounts.size() != BankNames.size())
-        return false;
-
-    std::int32_t Index = -1;
-    for (const auto& [EquipmentSlot, Item] : this->Items)
+    auto BankContainer = Containers::Container(Containers::BANK);
+    return std::all_of(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I)
     {
-        if (!Item) continue;
+        Containers::Item Found;
+        return InContainer(BankContainer, I.second, &Found) && Found.GetAmount() > 0;
+    });
+}
 
-        if (!InNameCache(BankNames, Item, nullptr, &Index))
-            return false;
-        else if (Index >= 0 && BankAmounts[Index] <= 0)
-            return false;
-    }
-    return true;
+std::uint32_t GearSets::Set::CountUnequipped() const
+{
+    auto EquipmentContainer = Containers::Container(Containers::EQUIPMENT);
+    return std::count_if(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I) { return InContainer(EquipmentContainer, I.second); });
 }
 
 std::uint32_t GearSets::Set::CountMissing() const
 {
-    std::uint32_t Count = 0;
-
-    auto BankAmounts = Bank::GetItemAmounts();
-    auto BankNames = Bank::GetItemNames();
-    auto InvNames = Inventory::GetItemNames();
-    auto EquipNames = Equipment::GetItemNames();
-
-    if (BankAmounts.size() != BankNames.size()) return Count;
-
-    std::int32_t Index = -1;
-    for (const auto& [EquipmentSlot, Item] : this->Items)
+    auto InventoryContainer = Containers::Container(Containers::INVENTORY);
+    auto EquipmentContainer = Containers::Container(Containers::EQUIPMENT);
+    auto BankContainer = Bank::IsOpen() ? Containers::Container(Containers::BANK) : Containers::Container();
+    return std::count_if(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I)
     {
-        if (!Item) continue;
-
-        if (InNameCache(InvNames, Item))
-            continue;
-
-        if (InNameCache(EquipNames, Item))
-            continue;
-
-        if (InNameCache(BankNames, Item, nullptr, &Index))
-            if (Index > 0 && BankAmounts[Index] > 0)
-                continue;
-
-        Count++;
-    }
-    return Count;
+        Containers::Item Found;
+        return !InContainer(InventoryContainer, I.second) && !InContainer(EquipmentContainer, I.second) && (!InContainer(BankContainer, I.second, &Found) || Found.GetAmount() <= 0);
+    });
 }
 
 std::uint32_t GearSets::SetFromEquipped(const std::string& Key)

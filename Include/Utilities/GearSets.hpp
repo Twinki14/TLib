@@ -39,8 +39,8 @@ namespace GearSets
         bool IsRepairable() const { return Repairable; };
         bool IsWeapon() const { return Info.equipableWeapon; };
         bool IsTwoHanded() const { return Info.equipment->slot == OSRSBox::Items::Slot::TwoHanded; };
-        bool IsBroken() const; // returns true if the item is unequipped, not found in inventory, and an item matching the id/name is found within the inventory
-        bool IsEmpty() const; // returns true if the item is unequipped, not found in inventory, and an item matching the id/name is found within the inventory
+        bool IsBroken() const; /// @return true if the item is unequipped, not found in inventory, and an item matching the id/name is found within the inventory
+        bool IsEmpty() const; /// @return true if the item is unequipped, not found in inventory, and an item matching the id/name is found within the inventory
 
         bool IsSpecialWeapon() const { return RequiredSpecial > 0; };
         bool CanSpecial() const;
@@ -93,14 +93,13 @@ namespace GearSets
         bool IsBroken() const; /// @return true if any items are degrable and are broken
         bool IsEmpty() const; /// @return true if any items are degrable and are broken
 
-        bool Holding() const; /// @brief All items are either equipped or in inventory
-        bool Equipped() const; /// @brief All items are equipped
-        bool InInventory() const; /// @brief All items are in inventory
-        bool InBank() const; /// @brief All items are in bank
+        bool Holding() const; /// @return true if all items are either equipped or in inventory
+        bool Equipped() const; /// @return true if all items are equipped
+        bool InInventory() const; /// @return true if all items are in inventory
+        bool InBank() const; /// @return true if all items are in bank
 
-        std::uint32_t CountMissing() const; // missing pieces from both inventory, bank, and equippment (only counts bank if it's open)
-
-        //const OSRSBox::Items::Equipment& GetTotalEquipmentInfo() const { return TotalEquipmentInfo; };
+        std::uint32_t CountUnequipped() const; /// @return how many gear items are not equipped
+        std::uint32_t CountMissing() const; // @return how many gear items are completely missing from the currently accessible item containers (bank if open), inventory, and equipment
 
         std::map<std::uint32_t, GearSets::Item> Items; // map will be ordered by Equipment:: enum
         OSRSBox::Items::Equipment TotalEquipmentInfo;
