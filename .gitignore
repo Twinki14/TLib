@@ -1,0 +1,11 @@
+
+cmake-build-debug/
+cmake-build-release/
+.idea/workspace.xml
+.idea/.gitignore
+.idea/vcs.xml
+.idea/$CACHE_FILE$
+.idea/TLib.iml
+.idea/modules.xml
+.idea/misc.xml
+.idea/inspectionProfiles/Project_Default.xml

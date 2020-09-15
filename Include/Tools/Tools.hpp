@@ -1,0 +1,9 @@
+#ifndef TLIB_TOOLS_HPP_INCLUDED
+#define TLIB_TOOLS_HPP_INCLUDED
+
+namespace Tools
+{
+
+}
+
+#endif // TLIB_TOOLS_HPP_INCLUDED
