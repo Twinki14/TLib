@@ -34,7 +34,7 @@ namespace Profile
             case Var_UseHotkeys_Gametabs:                       Old.B = UseHotkeys_Gametabs;            UseHotkeys_Gametabs = New.B; break;
             case Var_UseHotkeys_EscCloseInterface:              Old.B = UseHotkeys_EscCloseInterface;   UseHotkeys_EscCloseInterface = New.B; break;
 
-                // double
+            // double
             case Var_UseHotkeys_Gametabs_Chance:                    Old.D = UseHotkeys_Gametabs_Chance; UseHotkeys_Gametabs_Chance = New.D; break;
             case Var_UseHotkeys_EscCloseInterface_Chance:           Old.D = UseHotkeys_EscCloseInterface_Chance; UseHotkeys_EscCloseInterface_Chance = New.D; break;
 
@@ -45,7 +45,7 @@ namespace Profile
             case Var_RawKeyDownDeviation:       Old.D = Profile::GetRawKeyDownDeviation();      Profile::SetRawKeyDownDeviation(New.D); break;
             case Var_RawKeyUpDeviation:         Old.D = Profile::GetRawKeyUpDeviation();        Profile::SetRawKeyUpDeviation(New.D); break;
 
-                // int
+            // int
             case Var_RawInteractableMean:       Old.I = Profile::GetRawInteractableMean();      Profile::SetRawInteractableMean(New.I); break;
             case Var_RawMoveMean:               Old.I = Profile::GetRawMoveMean();              Profile::SetRawMoveMean(New.I); break;
             case Var_RawMouseDownMean:          Old.I = Profile::GetRawMouseDownMean();         Profile::SetRawMouseDownMean(New.I); break;

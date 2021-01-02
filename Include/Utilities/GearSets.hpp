@@ -99,7 +99,7 @@ namespace GearSets
         bool InBank() const; /// @return true if all items are in bank
 
         std::uint32_t CountUnequipped() const; /// @return how many gear items are not equipped
-        std::uint32_t CountMissing() const; // @return how many gear items are completely missing from the currently accessible item containers (bank if open), inventory, and equipment
+        std::uint32_t CountMissing(bool CheckBank = true) const; // @return how many gear items are completely missing from the currently accessible item containers (bank if open), inventory, and equipment
 
         std::map<std::uint32_t, GearSets::Item> Items; // map will be ordered by Equipment:: enum
         OSRSBox::Items::Equipment TotalEquipmentInfo;

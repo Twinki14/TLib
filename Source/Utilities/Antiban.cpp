@@ -331,14 +331,13 @@ namespace Antiban
     bool AFK_Quick()
     {
         bool TabOut = false;
-        enum TENDENCY { TENDENCY_NEVER = 0, TENDENCY_RARELY = 25, TENDENCY_REGULARLY = 50, TENDENCY_FREQUENTLY = 75, TENDENCY_VERY_FREQUENTLY = 100 };
-        switch ((TENDENCY) Profile::GetDouble(Profile::Var_TabOut_Tendency) * 100)
+        switch (Profile::GetInt(Profile::Var_TabOut_Tendency))
         {
-            case TENDENCY_NEVER:            TabOut = UniformRandom() <= 0.05; break;
-            case TENDENCY_RARELY:           TabOut = UniformRandom() <= 0.10; break;
-            case TENDENCY_REGULARLY:        TabOut = UniformRandom() <= 0.40; break;
-            case TENDENCY_FREQUENTLY:       TabOut = UniformRandom() <= 0.65; break;
-            case TENDENCY_VERY_FREQUENTLY:  TabOut = UniformRandom() <= 0.75; break;
+            case Profile::TENDENCY_VERY_LOW:  TabOut = UniformRandom() <= 0.05; break;
+            case Profile::TENDENCY_LOW:       TabOut = UniformRandom() <= 0.10; break;
+            case Profile::TENDENCY_NORMAL:    TabOut = UniformRandom() <= 0.40; break;
+            case Profile::TENDENCY_HIGH:      TabOut = UniformRandom() <= 0.65; break;
+            case Profile::TENDENCY_VERY_HIGH: TabOut = UniformRandom() <= 0.75; break;
             default: break;
         }
         if (TabOut) return Antiban::TabOut_Quick();
@@ -353,14 +352,13 @@ namespace Antiban
     bool AFK_Medium()
     {
         bool TabOut = false;
-        enum TENDENCY { TENDENCY_NEVER = 0, TENDENCY_RARELY = 25, TENDENCY_REGULARLY = 50, TENDENCY_FREQUENTLY = 75, TENDENCY_VERY_FREQUENTLY = 100 };
-        switch ((TENDENCY) Profile::GetDouble(Profile::Var_TabOut_Tendency) * 100)
+        switch (Profile::GetInt(Profile::Var_TabOut_Tendency))
         {
-            case TENDENCY_NEVER:            TabOut = UniformRandom() <= 0.05; break;
-            case TENDENCY_RARELY:           TabOut = UniformRandom() <= 0.10; break;
-            case TENDENCY_REGULARLY:        TabOut = UniformRandom() <= 0.40; break;
-            case TENDENCY_FREQUENTLY:       TabOut = UniformRandom() <= 0.65; break;
-            case TENDENCY_VERY_FREQUENTLY:  TabOut = UniformRandom() <= 0.75; break;
+            case Profile::TENDENCY_VERY_LOW:  TabOut = UniformRandom() <= 0.05; break;
+            case Profile::TENDENCY_LOW:       TabOut = UniformRandom() <= 0.10; break;
+            case Profile::TENDENCY_NORMAL:    TabOut = UniformRandom() <= 0.40; break;
+            case Profile::TENDENCY_HIGH:      TabOut = UniformRandom() <= 0.65; break;
+            case Profile::TENDENCY_VERY_HIGH: TabOut = UniformRandom() <= 0.75; break;
             default: break;
         }
         if (TabOut) return Antiban::TabOut_Medium();
@@ -375,14 +373,13 @@ namespace Antiban
     bool AFK_Long()
     {
         bool TabOut = false;
-        enum TENDENCY { TENDENCY_NEVER = 0, TENDENCY_RARELY = 25, TENDENCY_REGULARLY = 50, TENDENCY_FREQUENTLY = 75, TENDENCY_VERY_FREQUENTLY = 100 };
-        switch ((TENDENCY) Profile::GetDouble(Profile::Var_TabOut_Tendency) * 100)
+        switch (Profile::GetInt(Profile::Var_TabOut_Tendency))
         {
-            case TENDENCY_NEVER:            TabOut = UniformRandom() <= 0.05; break;
-            case TENDENCY_RARELY:           TabOut = UniformRandom() <= 0.10; break;
-            case TENDENCY_REGULARLY:        TabOut = UniformRandom() <= 0.40; break;
-            case TENDENCY_FREQUENTLY:       TabOut = UniformRandom() <= 0.65; break;
-            case TENDENCY_VERY_FREQUENTLY:  TabOut = UniformRandom() <= 0.80; break;
+            case Profile::TENDENCY_VERY_LOW:  TabOut = UniformRandom() <= 0.05; break;
+            case Profile::TENDENCY_LOW:       TabOut = UniformRandom() <= 0.10; break;
+            case Profile::TENDENCY_NORMAL:    TabOut = UniformRandom() <= 0.40; break;
+            case Profile::TENDENCY_HIGH:      TabOut = UniformRandom() <= 0.65; break;
+            case Profile::TENDENCY_VERY_HIGH: TabOut = UniformRandom() <= 0.75; break;
             default: break;
         }
         if (TabOut) return Antiban::TabOut_Long();
@@ -396,7 +393,8 @@ namespace Antiban
 
     std::int32_t GenerateDelayFromPassivity(std::int32_t Min, std::int32_t Max, double Multiplier, double ChanceToMultiply)
     {
-        auto Delay = BinomialRandom(Min, Max, Profile::GetDouble(Profile::Var_Passivity));
+        double Passivity = (Profile::GetInt(Profile::Var_Passivity) + 0.00) / Profile::PASSIVITY_DISINTERESTED + 0.00;
+        auto Delay = BinomialRandom(Min, Max, Passivity);
 
         if (Multiplier > 0.00 && UniformRandom() <= ChanceToMultiply)
         {
@@ -404,7 +402,7 @@ namespace Antiban
             Delay *= Multiplier;
         }
 
-        Delay = NormalRandom(Delay, Delay * 0.12);
+        Delay = NormalRandom(Delay, Delay * 0.15);
         DebugLog("Delay > {}", Delay);
         return Delay;
     }

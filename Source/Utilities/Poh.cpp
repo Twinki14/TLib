@@ -154,7 +154,14 @@ bool POH::IsInside()
 
 bool POH::InBuildMode()
 {
-    return POH::IsInside() && Settings::GetSetting(Globals::SETTING_POH_BUILD_MODE.Index) > 0;
+    if (POH::IsInside())
+    {
+        auto Varbit = Internal::GetVarbit(2176);
+        int Setting = Settings::GetSetting(Varbit.GetSettingID());
+        int mask = (1 << ((Varbit.GetMSB() - Varbit.GetLSB()) + 1)) - 1;
+        return Setting > 0 || Settings::GetSetting(Globals::SETTING_POH_BUILD_MODE.Index) > 0;
+    }
+    return false;
 }
 
 bool POH::IsLoading()

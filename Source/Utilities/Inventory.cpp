@@ -1,5 +1,8 @@
 #include "../../Include/Utilities/Inventory.hpp"
+#include "../../Include/Utilities/TProfile.hpp"
 #include <Core/Internal.hpp>
+#include <Game/Tools/Interact.hpp>
+#include <Game/Tools/Profile.hpp>
 
 namespace Inventory
 {
@@ -106,5 +109,70 @@ namespace Inventory
             }
         }
         return Result;
+    }
+
+/*    bool Move(const Interactable::Item& Item, std::int32_t ToSlot, bool AllowSwap)
+    {
+        if (!Item || ToSlot < 0 || ToSlot > 27) return false;
+        if (Item.GetIndex() == ToSlot) return true;
+        if (!AllowSwap && Inventory::GetItemIDs()[ToSlot] == -1) return false;
+
+        auto SlotBoxes = Inventory::GetSlotBoxes();
+        if (SlotBoxes.empty() || ToSlot >= SlotBoxes.size())
+            return false;
+
+        if (Item.Hover())
+        {
+            MouseDown(BUTTON_LEFT);
+            Timer T;
+            if (WaitFunc(650, 75, Internal::GetDraggingItem, true))
+            {
+                T.Suspend();
+                std::int32_t ProfileWait = NormalRandom(Profile::GetMouseDownMean(), Profile::GetMouseDownMean() * Profile::GetMouseDownDeviation());
+                std::int32_t TimePassed = ProfileWait - T.GetTimeElapsed();
+                if (TimePassed > 0) Wait(TimePassed);
+
+                auto SlotBox = Inventory::GetSlotBoxes()[ToSlot];
+                if (Interact::MoveMouse(SlotBox.GetProfileHybridRandomPoint()))
+                {
+                    MouseUp(BUTTON_LEFT);
+                    Wait(NormalRandom(Profile::GetMouseUpMean(), Profile::GetMouseUpMean() * Profile::GetMouseUpDeviation()));
+                    return WaitFunc(250, 25, Internal::GetDraggingItem, false);
+                }
+            } else
+            {
+                MouseUp(BUTTON_LEFT);
+                Wait(NormalRandom(Profile::GetMouseUpMean(), Profile::GetMouseUpMean() * Profile::GetMouseUpDeviation()));
+                return false;
+            }
+        }
+        return false;
+    }*/
+
+    bool Move(const Interactable::Item& Item, std::int32_t ToSlot, bool AllowSwap)
+    {
+        if (!Item || ToSlot < 0 || ToSlot > 27) return false;
+        if (Item.GetIndex() == ToSlot) return true;
+        if (!AllowSwap && Inventory::GetItemIDs()[ToSlot] == -1) return false;
+
+        auto SlotBoxes = Inventory::GetSlotBoxes();
+        if (SlotBoxes.empty() || ToSlot >= SlotBoxes.size())
+            return false;
+
+        Profile::Push(Profile::Var_RawInteractableMean, 125);
+        if (Item.Hover())
+        {
+            Profile::Pop(1);
+            MouseDown(BUTTON_LEFT);
+            Wait(NormalRandom(225, 225 * 0.10));
+            auto SlotBox = Inventory::GetSlotBoxes()[ToSlot];
+            if (Interact::MoveMouse(SlotBox.GetProfileHybridRandomPoint()))
+            {
+                MouseUp(BUTTON_LEFT);
+                Wait(NormalRandom(Profile::GetMouseUpMean(), Profile::GetMouseUpMean() * Profile::GetMouseUpDeviation()));
+                return true;
+            }
+        }
+        return false;
     }
 }

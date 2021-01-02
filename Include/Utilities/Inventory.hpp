@@ -25,6 +25,10 @@ namespace Inventory
     std::vector<std::int32_t> CountIndividual(const std::vector<std::int32_t>& IDs, const std::vector<CONTAINER_ITEM>& ContainerItems);
     std::vector<std::int32_t> CountIndividual(const std::vector<std::string>& Names, const std::vector<CONTAINER_ITEM>& ContainerItems);
     std::vector<std::int32_t> CountIndividual(const std::vector<Interactable::Item>& Items, const std::vector<CONTAINER_ITEM>& ContainerItems);
+
+    bool Move(std::int32_t ID, std::int32_t ToSlot, bool AllowSwap = false);
+    bool Move(const std::string& Name, std::int32_t ToSlot, bool AllowSwap = false);
+    bool Move(const Interactable::Item& Item, std::int32_t ToSlot, bool AllowSwap = false);
 }
 
 #endif // TLIB_INVENTORY_HPP_INCLUDED

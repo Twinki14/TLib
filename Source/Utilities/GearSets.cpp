@@ -454,7 +454,7 @@ std::uint32_t GearSets::Set::CountUnequipped() const
     return std::count_if(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I) { return InContainer(EquipmentContainer, I.second); });
 }
 
-std::uint32_t GearSets::Set::CountMissing() const
+std::uint32_t GearSets::Set::CountMissing(bool CheckBank) const
 {
     auto InventoryContainer = Containers::Container(Containers::INVENTORY);
     auto EquipmentContainer = Containers::Container(Containers::EQUIPMENT);
@@ -462,7 +462,7 @@ std::uint32_t GearSets::Set::CountMissing() const
     return std::count_if(this->Items.begin(), this->Items.end(), [&](const std::pair<std::uint32_t, Item>& I)
     {
         Containers::Item Found;
-        return !InContainer(InventoryContainer, I.second) && !InContainer(EquipmentContainer, I.second) && (!InContainer(BankContainer, I.second, &Found) || Found.GetAmount() <= 0);
+        return !InContainer(InventoryContainer, I.second) && !InContainer(EquipmentContainer, I.second) && (!CheckBank || (!InContainer(BankContainer, I.second, &Found) || Found.GetAmount() <= 0));
     });
 }
 
